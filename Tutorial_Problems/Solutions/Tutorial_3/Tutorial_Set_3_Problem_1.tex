@@ -1,0 +1,166 @@
+\documentclass{article}
+\usepackage{helvet}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{microtype} % Prevents overfull hboxes by better text wrapping
+\geometry{margin=1in}
+\usepackage{subcaption}
+\usepackage{listings}
+\usepackage{color}
+% Define colors for code syntax highlighting
+\definecolor{codeblue}{rgb}{0.13, 0.13, 0.7}
+\definecolor{codegreen}{rgb}{0, 0.5, 0}
+\definecolor{codegray}{rgb}{0.5, 0.5, 0.5}
+\definecolor{codepurple}{rgb}{0.58, 0, 0.82}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{white},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{codeblue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
+% Define colors
+\definecolor{primary}{RGB}{0, 102, 204} % Blue color
+\definecolor{IITBBlue}{RGB}{0, 51, 102} % IIT Bombay's signature blue
+
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{placeins}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{physics}
+
+
+
+
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+
+\title{Tutorial Set 3, Problem 1: EE 338, Spring 2024-25}
+\author{
+\IEEEauthorblockN{
+    \begin{tabular}{cccc}
+        \begin{minipage}[t]{0.23\textwidth}
+            \centering
+            Anupam Rawat\\
+            IIT Bombay\\
+            22b3982@iitb.ac.in
+        \end{minipage} & 
+        \begin{minipage}[t]{0.23\textwidth}
+            \centering
+            Rishabh Bhardwaj\\
+            IIT Bombay\\
+            22b3962@iitb.ac.in
+        \end{minipage} & 
+        \begin{minipage}[t]{0.23\textwidth}
+            \centering
+            Jatin Kumar\\
+            IIT Bombay\\
+            22b3922@iitb.ac.in
+        \end{minipage} \\
+        \\ 
+    \end{tabular}
+}
+}
+
+\date{January 18, 2025}
+
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\usepackage{ulem,graphicx}
+\usepackage[margin=0.5in]{geometry}
+
+\begin{document}
+\maketitle
+
+\\
+
+\begin{enumerate}
+    \item Let the input sequence x[n] and impulse response sequence h[n] of a discrete time LSI system be:
+    \begin{enumerate}
+        \item summable, i.e. \(\Sigma_n\)x[n] is finite, \(\Sigma_n\)h[n] is finite, with sums \(\Sigma_x\) and \(\Sigma_h\) respectively. Show that the output, if summable, has the sum \(\Sigma_x\)\(\Sigma_x\).
+        \item absolutely summable, i.e. \(\Sigma_n|x[n]|\) is finite, \(\Sigma_n|h[n]|\) is finite, with absolute sums \(X_0\) and \(H_0\), respectively. Show that the output, if absolutely summable, has an upper absolute sum bounded by \(X_0H_0\).
+    \end{enumerate}
+    
+    \\
+        \makebox[0pt][l]{\hspace{-7pt}\textit{Soln:}} % Aligns "Answer:" to the left
+    \\
+    
+    \begin{enumerate}
+        \item 
+            Both of $\Sigma_x$ and $\Sigma_h$ are finite. And we're given that:
+            \[
+                \Sigma_x = \Sigma_nx[n]
+            \]
+            \[
+                \Sigma_h = \Sigma_nh[n]
+            \]
+            For a discrete time LSI System, with the impulse response as h[n] and the input as x[n], the output: 
+            \[
+                y[n] = (x \ast h)[n] = \Sigma_kx[k]h[n-k]
+            \]
+            Assuming y[n] is finite. The sum of the output is given as 
+            \[
+                \Sigma_ny[n] = \Sigma_n(\Sigma_kx[k]h[n-k])
+            \]
+            \[
+                \Sigma_ny[n] = (...+x[0]h[0]+x[1]h[1]+...) + (...+x[1]h[0]+x[2]h[1]+...) + (...+x[2]h[0]+x[3]h[1]+...)
+            \]
+            \[
+                \Sigma_ny[n] = ... + (...+x[0]h[0]+x[1]h[0]+x[2]h[0]+...) + (...x[1]h[1]+x[2]h[1]+x[3]h[1]+...) + ...
+            \]
+            \[
+                \Sigma_ny[n] = ... + (...+x[0]+x[1]+x[2]+...)h[0] + (...x[1]+x[2]+x[3]+...)h[1] + ...
+            \]
+            \[
+                \Sigma_ny[n] = (... + x[0] + x[1] + x[2] +...)(... + h[0] + h[1] + h[2] +...) = (\Sigma_nx[n])(\Sigma_nh[n])
+            \]
+        \item 
+            We know that both $\Sigma_x$ and $\Sigma_h$ are finite. Suppose $\Sigma_n|y[n]|$ exists. \\
+            \[
+                \Sigma_n|y[n]| = \Sigma_n|(\Sigma_k x[k]h[n-k])|
+            \]
+            Now, using the property that $|\Sigma_i a_i|$ $\le$ $\Sigma_i|a_i|$:
+            \[
+                \Sigma_n|y[n]| \le \Sigma_n \Sigma_k |x[k] h[n-k]| = \Sigma_n \Sigma_k |x[k]|\cdot|h[n-k]|
+            \]
+            \[
+                \Sigma_n|y[n]| \le \Sigma_k |x[k]| \cdot (\Sigma_n |h[n-k]|) = \Sigma_k |x[k]| \cdot H_0 = X_0 \cdot H_0
+            \]
+            Therefore, 
+            \[
+                \Sigma_n|y[n]| \le X_0\cdot H_0
+            \]
+            Thus, the output if absolutely summable, is upper bounded by $H_0\cdot X_0$
+    \end{enumerate}
+
+
+\end{enumerate}
+\end{document}
+
