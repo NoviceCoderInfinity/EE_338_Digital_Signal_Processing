@@ -1,0 +1,127 @@
+\documentclass{article}
+\usepackage{helvet}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{microtype} % Prevents overfull hboxes by better text wrapping
+\geometry{margin=1in}
+\usepackage{subcaption}
+\usepackage{listings}
+\usepackage{color}
+% Define colors for code syntax highlighting
+\definecolor{codeblue}{rgb}{0.13, 0.13, 0.7}
+\definecolor{codegreen}{rgb}{0, 0.5, 0}
+\definecolor{codegray}{rgb}{0.5, 0.5, 0.5}
+\definecolor{codepurple}{rgb}{0.58, 0, 0.82}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{white},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{codeblue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
+% Define colors
+\definecolor{primary}{RGB}{0, 102, 204} % Blue color
+\definecolor{IITBBlue}{RGB}{0, 51, 102} % IIT Bombay's signature blue
+
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{placeins}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{physics}
+
+
+
+
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+
+\title{Challenge Problem 3: EE 338, Spring 2024-25}
+\author{
+\IEEEauthorblockN{
+    \begin{tabular}{cccc}
+        \begin{minipage}[t]{0.23\textwidth}
+            \centering
+            Anupam Rawat\\
+            IIT Bombay\\
+            22b3982@iitb.ac.in
+        \end{minipage} & 
+        \begin{minipage}[t]{0.23\textwidth}
+            \centering
+            Jatin Kumar\\
+            IIT Bombay\\
+            22b3922@iitb.ac.in
+        \end{minipage} & 
+        \begin{minipage}[t]{0.23\textwidth}
+            \centering
+            Rishabh Bhardwaj\\
+            IIT Bombay\\
+            22b3962@iitb.ac.in
+        \end{minipage}\\
+        \\ 
+    \end{tabular}
+}
+}
+
+\date{Januaray 19, 2025}
+
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\usepackage{ulem,graphicx}
+\usepackage[margin=0.5in]{geometry}
+
+\begin{document}
+\maketitle
+
+\\
+
+\begin{enumerate}
+    \item What are the advantages or benefits of aliasing?
+    \\
+    \makebox[0pt][l]{\hspace{-7pt}\textit{Soln:}} % Aligns "Answer:" to the left
+    \\
+    \textbf{Aliasing} occurs when a continuous-time signal \(x(t)\) is sampled at intervals \(T_s\) or frequency \(f_s = \frac{1}{T_s}\), and its sampled representation \(x[n]\) cannot uniquely represent the original signal due to insufficient sampling rates. The frequency spectrum of the sampled signal is given by:
+        \[
+        X_s(\omega) = \frac{1}{T_s} \sum_{k=-\infty}^\infty X\left(\omega - k\omega_s\right),
+        \]
+        where \(X_s(\omega)\) is the sampled signal's spectrum, \(\omega_s = 2\pi f_s\), and \(k\) is the integer index for shifted spectral replicas. \\
+    \textbf{Benefits of Aliasing} are:
+    \begin{enumerate}
+        \item Using aliasing we \textbf{compress} bandpass signals by sampling them at rates lower than Nyquist Rate without losing information
+        \item Aliasing can be used in \textbf{frequency translation}, where we can shift high frequency signals into a lower frequency range (baseband) for easier processing, as seen in superhetrodyne receivers.
+        \item Aliasing can create richer textures in \textbf{music production} by introducing harmonics.
+        \item In \textbf{Magnetic Resonance Imaging (MRI)}, aliasing can be used to achieve faster scanning through parallel imaging.
+        \item  In advanced communication systems, aliasing can be used to shape the spectral properties of signals, allowing for better utilization of available bandwidth.
+        \item In cases of limited bandwidth, controlled aliasing techniques can be used to reduce the amount of data that needs to be transmitted or stored.
+        \item By exploiting aliasing, systems can be designed with lower sampling rates, which in turn reduces the complexity and cost of hardware components. This approach is particularly beneficial in applications like software-defined radio, where processing high-frequency signals directly at lower sampling rates simplifies the overall system design
+    \end{enumerate}
+    
+\end{enumerate}
+\end{document}
+
