@@ -1,0 +1,146 @@
+\documentclass{article}
+\usepackage{helvet}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{microtype} % Prevents overfull hboxes by better text wrapping
+\geometry{margin=1in}
+\usepackage{subcaption}
+\usepackage{listings}
+\usepackage{color}
+% Define colors for code syntax highlighting
+\definecolor{codeblue}{rgb}{0.13, 0.13, 0.7}
+\definecolor{codegreen}{rgb}{0, 0.5, 0}
+\definecolor{codegray}{rgb}{0.5, 0.5, 0.5}
+\definecolor{codepurple}{rgb}{0.58, 0, 0.82}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{white},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{codeblue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
+% Define colors
+\definecolor{primary}{RGB}{0, 102, 204} % Blue color
+\definecolor{IITBBlue}{RGB}{0, 51, 102} % IIT Bombay's signature blue
+
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{placeins}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{physics}
+
+
+
+
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+
+\title{In Class Tutorial, Problem 4: EE 338, Spring 2024-25}
+\author{
+\IEEEauthorblockN{
+    \begin{tabular}{cccc}
+        \begin{minipage}[t]{0.23\textwidth}
+            \centering
+            Anupam Rawat\\
+            IIT Bombay\\
+            22b3982@iitb.ac.in
+        \end{minipage} & 
+        \begin{minipage}[t]{0.23\textwidth}
+            \centering
+            Jatin Kumar\\
+            IIT Bombay\\
+            22b3922@iitb.ac.in
+        \end{minipage} &
+        \begin{minipage}[t]{0.23\textwidth}
+            \centering
+            Rishabh Bhardwaj\\
+            IIT Bombay\\
+            22b3962@iitb.ac.in
+        \end{minipage} \\ 
+         \\
+        \\ 
+    \end{tabular}
+}
+}
+
+\date{March 10, 2025}
+
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\usepackage{ulem,graphicx}
+\usepackage[margin=0.5in]{geometry}
+
+\begin{document}
+\maketitle
+
+\\
+
+\begin{enumerate}
+    \item Given $x_1[n]$ and $x_2[n]$, Prove that:- 
+    \[
+        DTFT(x_1[n]\cdot x_2[n]) = \frac{1}{2\pi} \int_{2\pi} X_1(e^{j\lambda}) X_2(e^{j(\omega-\lambda)})d\lambda
+    \]
+        
+    \\
+        \makebox[0pt][l]{\hspace{-7pt}\textit{Soln:}} % Aligns "Answer:" to the left
+    \\
+
+    We know that the DTFT of a discrete time signal x[n] is given by:
+    \begin{equation}
+        X(e^{j\omega}) = \sum_{n=-\infty}^{+\infty}x[n] e^{-j\omega n}
+    \end{equation}
+        
+    Thus,DTFT of $x_1[n]\cdot x_2[n]$ is given by:
+    \begin{equation}
+        DTFT(x_1[n]\cdot x_2[n]) = \sum_{n=-\infty}^{+\infty} (x_1[n]\cdot x_2[n])e^{-j\omega n}
+    \end{equation}
+        
+    The inverse DTFT of a signal $X(e^{j\omega})$ is given by:
+    \begin{equation}
+        x[n] = \frac{1}{2\pi}\int_{-\pi}^{+\pi} X(e^{j\omega})e^{j\omega n} d\omega
+    \end{equation}
+        
+    Substituting $x_1[n]$, in eqn(2) with the formula in eqn(3):
+    \begin{equation}
+        DTFT(x_1[n] \cdot x_2[n]) = \sum_{n=-\infty}^{+\infty} (x_1[n]\cdot x_2[n])e^{-j\omega n} = \sum_{n=-\infty}^{+\infty} \left(\left(\frac{1}{2\pi}\int_{-\pi}^{+\pi} X_1(e^{j\lambda})e^{j\lambda n} d\lambda\right)\cdot x_2[n]\right)e^{-j\omega n}
+    \end{equation}
+    \begin{equation}
+        DTFT(x_1[n] \cdot x_2[n]) = \frac{1}{2\pi}\int_{-\pi}^{+\pi} X_1(e^{j\lambda})  \left(\sum_{n=-\infty}^{+\infty} x_2[n] e^{j(\omega-\lambda)n} \right) d\lambda
+    \end{equation}
+    Using eqn(1), the inner discrete summation over n in eqn(5), can be evaluated to $X(e^{j(\omega-\lambda)})$.
+    \begin{equation}
+        DTFT(x_1[n] \cdot x_2[n]) = \frac{1}{2\pi}\int_{-\pi}^{+\pi} X(e^{j\lambda}) X_2(e^{j(\omega-\lambda)n}) d\lambda
+    \end{equation}
+    \emph{Hence Proved}
+    
+    
+    
+\end{enumerate}
+\end{document}
