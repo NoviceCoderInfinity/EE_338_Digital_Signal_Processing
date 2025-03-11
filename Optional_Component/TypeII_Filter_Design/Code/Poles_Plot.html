@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plot of Poles</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.3.2/math.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.20.0.min.js"></script>
+</head>
+<body>
+    <h2>Pole Plot in Complex Plane</h2>
+    <div id="pole-plot" style="width: 600px; height: 600px;"></div>
+
+    <script>
+        function plotPoles() {
+            const A_values = [-0.229, 0.229];
+            const B = 1.026;
+            let theta = Array.from({length: 7}, (_, k) => (Math.PI * (2 * k + 1)) / 14);
+            let poles = [];
+
+            A_values.forEach(A => {
+                theta.forEach(t => {
+                    let realPart = A * Math.sin(t);
+                    let imagPart = B * Math.cos(t);
+                    poles.push({x: realPart, y: imagPart});
+                });
+            });
+
+            let trace = {
+                x: poles.map(p => p.x),
+                y: poles.map(p => p.y),
+                mode: 'markers',
+                marker: { color: 'blue', size: 8 },
+                type: 'scatter'
+            };
+
+            let layout = {
+                title: 'Pole Plot in Complex Plane',
+                xaxis: { title: 'Real Part', zeroline: true, scaleanchor: "y" },
+                yaxis: { title: 'Imaginary Part', zeroline: true },
+                showlegend: false
+            };
+
+            Plotly.newPlot('pole-plot', [trace], layout);
+        }
+
+        plotPoles();
+    </script>
+</body>
+</html>
