@@ -23,3 +23,7 @@ If you want to run the code offline, follow these steps:
 3. **Open the HTML file in a browser**
 
 By following these steps, you can run the HTML file without an internet connection.
+
+### Python Code
+
+Initially I had submitted the Jupyter Notebook containing the Python, to prevent any plagarism related cases, I have also submitted code for plotting in JavaScript.

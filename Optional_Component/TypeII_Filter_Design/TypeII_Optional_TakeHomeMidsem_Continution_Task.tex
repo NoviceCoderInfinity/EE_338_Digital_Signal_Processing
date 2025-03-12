@@ -873,7 +873,7 @@ K \approx 0.0367
 \]
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=0.7\linewidth]{./Optional_Images/BandPass_Filter_Response.png}
+    \includegraphics[width=1\linewidth]{./Optional_Images/BandPass_Filter_Response.png}
     \caption{Plot of Filter Response for BandPass Filter}
     \label{fig:enter-label}
 \end{figure}
@@ -889,7 +889,7 @@ K \approx 0.0367
 \]
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=0.8\linewidth]{./Optional_Images/BandStop_Filter_Response.png}
+    \includegraphics[width=1\linewidth]{./Optional_Images/BandStop_Filter_Response.png}
     \caption{Plot of Filter Response for BandStop Filter}
     \label{fig:enter-label}
 \end{figure}
@@ -897,101 +897,360 @@ K \approx 0.0367
 \subsection{Filter Response for Cascaded Filter}
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=0.8\linewidth]{./Optional_Images/Cascaded_Filter_Response.png}
+    \includegraphics[width=1\linewidth]{./Optional_Images/Cascaded_Filter_Response.png}
     \caption{Plot of Filter Response for Cascaded Filter}
     \label{fig:enter-label}
 \end{figure}
 
 
 \newpage 
-\section{Code for Plot Generation}
+\section{Code for Poles Plot and Filter Response Plot}
 The following section provides the code used to generate the plots in Python.
 
-\subsection{Python Code for BandPass Filter}
-\begin{lstlisting}[language=Python, caption=Filter Type Definition]
-def BandPassFilter(x):
-    Numerator = 1
-    Denominator = 1
+\subsection{JavaScript Code for Poles Plot}
+\begin{lstlisting}[language=HTML, caption=Filter Type Definition]
+function plotPoles() {
+    const A_values = [-0.229, 0.229];
+    const B = 1.026;
+    let theta = Array.from({length: 7}, (_, k) => (Math.PI * (2 * k + 1)) / 14);
+    let poles = [];
 
-    for k in range(7):
-        term1 = (-1j) * np.cos((2 * k + 1) * np.pi / 14) * np.cosh(0.227540122101)
-        term2 = np.sin((2 * k + 1) * np.pi / 14) * np.sinh(0.227540122101)
+    A_values.forEach(A => {
+        theta.forEach(t => {
+            let realPart = A * Math.sin(t);
+            let imagPart = B * Math.cos(t);
+            poles.push({x: realPart, y: imagPart});
+        });
+    });
 
-        fraction = (1 - np.exp(-1j * x)) / (1 + np.exp(-1j * x))
-        term3 = (fraction**2 + 0.918) / (1.59 * fraction)
+    let trace = {
+        x: poles.map(p => p.x),
+        y: poles.map(p => p.y),
+        mode: 'markers',
+        marker: { color: 'blue', size: 8 },
+        type: 'scatter'
+    };
 
-        Numerator *= term1 + term2
-        Denominator *= term3 - term1 + term2
+    let layout = {
+        title: 'Pole Plot in Complex Plane',
+        xaxis: { title: 'Real Part', zeroline: true, scaleanchor: "y" },
+        yaxis: { title: 'Imaginary Part', zeroline: true },
+        showlegend: false
+    };
 
-    return Numerator / Denominator
+    Plotly.newPlot('pole-plot', [trace], layout);
+}
 
-x_values = np.linspace(-np.pi, np.pi, 1000)
-y_values = np.array([BandPassFilter(x) for x in x_values])
-y_values_real = np.nan_to_num(y_values.real, nan=0.0)
-y_values_imag = np.nan_to_num(y_values.imag, nan=0.0)
-
-plt.figure(figsize=(10, 5))
-plt.plot(x_values, (y_values_real**2 + y_values_imag**2) ** 0.5, color="r",)
-plt.xlabel("Omega")
-plt.ylabel("frequency response")
-plt.legend()
-plt.title("Frequency response of Bandpass filter")
-plt.grid()
-plt.show()
+plotPoles();
 \end{lstlisting}
 
-\subsection{Python Code for BandStop Filter}
-\begin{lstlisting}[language=Python, caption=Filter Type Definition]
-def BandStopFilter(x):
-    Numerator = 1
-    Denominator = 1
+\subsection{JavaScript Code for BandPass Filter Response}
+\begin{lstlisting}[language=HTML, caption=Filter Type Definition]
+window.onload = function () {
+    console.log("Math.js Loaded:", typeof math !== "undefined");
+    console.log("Plotly Loaded:", typeof Plotly !== "undefined");
 
-    for k in range(7):
-        term1 = (-1j) * np.cos((2 * k + 1) * np.pi / 14) * np.cosh(0.227540122101)
-        term2 = np.sin((2 * k + 1) * np.pi / 14) * np.sinh(0.227540122101)
+    if (typeof math === "undefined" || typeof Plotly === "undefined") {
+        alert("Error: Math.js or Plotly.js failed to load. Check your internet connection.");
+        return;
+    }
 
-        fraction = (1 - np.exp(-1j * x)) / (1 + np.exp(-1j * x))
-        term3 = (0.825 * fraction) / (fraction**2 + 0.94815)
+    function BandPassFilter(x) {
+        let Numerator = math.complex(1, 0);
+        let Denominator = math.complex(1, 0);
 
-        Numerator *= term1 + term2
-        Denominator *= term3 - term1 + term2
+        for (let k = 0; k < 7; k++) {
+            let angle = (2 * k + 1) * Math.PI / 14;
+            let term1 = math.multiply(
+                math.complex(0, -1), 
+                math.multiply(Math.cos(angle), 
+                Math.cosh(0.227540122101)));
+            let term2 = math.multiply(Math.sin(angle), Math.sinh(0.227540122101));
 
-    return Numerator / Denominator
+            let exponent = math.exp(math.multiply(math.complex(0, -1), x));
+            let fraction = math.divide(math.subtract(1, exponent), math.add(1, exponent));
 
+            let term3 = math.divide(math.add(math.pow(fraction, 2), 0.918), math.multiply(1.59, fraction));
 
-x_values = np.linspace(-np.pi, np.pi, 1000)
-y_values = np.array([BandStopFilter(x) for x in x_values])
-y_values_real = np.nan_to_num(y_values.real, nan=0.0)
-y_values_imag = np.nan_to_num(y_values.imag, nan=0.0)
+            Numerator = math.multiply(Numerator, math.add(term1, term2));
+            Denominator = math.multiply(Denominator, math.subtract(math.subtract(term3, term1), term2));
+        }
 
-plt.figure(figsize=(10, 5))
-plt.plot(x_values, (y_values_real**2 + y_values_imag**2) ** 0.5, color="b")
-plt.xlabel("Omega")
-plt.ylabel("frequency response")
-plt.legend()
-plt.title("Frequency response of BandStop Filter")
-plt.grid()
-plt.show()
+        return math.divide(Numerator, Denominator);
+    }
+
+    // Values on the x-axis
+    let x_values = math.range(-Math.PI, Math.PI, 2 * Math.PI / 1000).toArray();
+    
+    // BandPass Filter Response
+    let y_bandpass = x_values.map(x => BandPassFilter(x));
+    let mag_bandpass = y_bandpass.map(y => math.abs(y));
+
+    let trace1 = {
+        x: x_values,
+        y: mag_bandpass,
+        mode: 'lines',
+        line: { color: 'red' },
+        name: 'BandPass Magnitude'
+    };
+
+    let layout1 = {
+        title: "Frequency Response of BandPass Filter",
+        xaxis: { title: "Omega" },
+        yaxis: { title: "Frequency Response" },
+        grid: { visible: true }
+    };
+
+    Plotly.newPlot("bandpass-plot", [trace1], layout1);
+};
 \end{lstlisting}
 
-\subsection{Python Code for Cascaded Filter}
-\begin{lstlisting}[language=Python, caption=Filter Type Definition]
-x_values = np.linspace(-np.pi, np.pi, 1000)
-y_values = np.array([BandPassFilter(x)*BandStopFilter(x) for x in x_values])
-y_values_real = np.nan_to_num(y_values.real, nan=0.0)
-y_values_imag = np.nan_to_num(y_values.imag, nan=0.0)
+\subsection{JavaScript Code for BandStop Filter}
+\begin{lstlisting}[language=HTML, caption=Filter Type Definition]
+window.onload = function () {
+    console.log("Math.js Loaded:", typeof math !== "undefined");
+    console.log("Plotly Loaded:", typeof Plotly !== "undefined");
 
-plt.figure(figsize=(10, 5))
-plt.plot(x_values, (y_values_real**2 + y_values_imag**2) ** 0.5, color="r")
-plt.xlabel("omega")
-plt.ylabel("frequency response")
-plt.legend()
-plt.title("Frequency response of Cascaded filter")
-plt.grid()
-plt.show()
+    if (typeof math === "undefined" || typeof Plotly === "undefined") {
+        alert("Error: Math.js or Plotly.js failed to load. Check your internet connection.");
+        return;
+    }
+
+    function BandStopFilter(x) {
+        let Numerator = math.complex(1, 0);
+        let Denominator = math.complex(1, 0);
+
+        for (let k = 0; k < 7; k++) {
+            let angle = (2 * k + 1) * Math.PI / 14;
+            let term1 = math.multiply(math.complex(0, -1), math.multiply(Math.cos(angle), Math.cosh(0.227540122101)));
+            let term2 = math.multiply(Math.sin(angle), Math.sinh(0.227540122101));
+
+            let exponent = math.exp(math.multiply(math.complex(0, -1), x));
+            let fraction = math.divide(math.subtract(1, exponent), math.add(1, exponent));
+
+            let term3 = math.divide(math.multiply(0.825, fraction), math.add(math.pow(fraction, 2), 0.94815));
+
+            Numerator = math.multiply(Numerator, math.add(term1, term2));
+            Denominator = math.multiply(Denominator, math.subtract(math.add(term3, term2), term1));
+        }
+
+        return math.divide(Numerator, Denominator);
+    }
+
+    // Values on the x-axis
+    let x_values = math.range(-Math.PI, Math.PI, 2 * Math.PI / 1000).toArray();
+        
+    // BandStop Filter Response
+    let y_bandstop = x_values.map(x => BandStopFilter(x));
+    let mag_bandstop = y_bandstop.map(y => math.abs(y));
+    
+    let trace2 = {
+        x: x_values,
+        y: mag_bandstop,
+        mode: 'lines',
+        line: { color: 'blue' },
+        name: 'BandStop Magnitude'
+    };
+
+    let layout2 = {
+        title: "Frequency Response of BandStop Filter",
+        xaxis: { title: "Omega" },
+        yaxis: { title: "Frequency Response" },
+        grid: { visible: true }
+    };
+
+    Plotly.newPlot("bandstop-plot", [trace2], layout2);
+};
 \end{lstlisting}
 
 
+\subsection{JavaScript Code for Cascaded Filter Response}
+\begin{lstlisting}[language=HTML, caption=Filter Type Definition]
+window.onload = function () {
+    console.log("Math.js Loaded:", typeof math !== "undefined");
+    console.log("Plotly Loaded:", typeof Plotly !== "undefined");
+
+    if (typeof math === "undefined" || typeof Plotly === "undefined") {
+        alert("Error: Math.js or Plotly.js failed to load. Check your internet connection.");
+        return;
+    }
+    
+    // Values on the x-axis
+    let x_values = math.range(-Math.PI, Math.PI, 2 * Math.PI / 1000).toArray();
+    // Cascaded Filter Response
+    let y_cascaded = y_bandpass.map((bp, i) => math.multiply(bp, y_bandstop[i]));
+    let mag_cascaded = y_cascaded.map(y => math.abs(y));
+
+    let trace3 = {
+        x: x_values,
+        y: mag_cascaded,
+        mode: 'lines',
+        line: { color: 'purple' },
+        name: 'Cascaded Filter Magnitude'
+    };
+
+    let layout3 = {
+        title: "Frequency Response of Cascaded Filter (BandPass × BandStop)",
+        xaxis: { title: "Omega" },
+        yaxis: { title: "Frequency Response" },
+        grid: { visible: true }
+    };
+
+    Plotly.newPlot("cascaded-plot", [trace3], layout3);
+};
+\end{lstlisting}
+
+\subsection{Combined JavaScript Code for Filter Response}
+\begin{lstlisting}[language=HTML, caption=Filter Type Definition]
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Filter Frequency Response</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.3.2/math.js" defer></script>
+    <script src="https://cdn.plot.ly/plotly-2.20.0.min.js" defer></script>
+</head>
+<body>
+
+<h2>Frequency Response of BandPass Filter</h2>
+<div id="bandpass-plot"></div>
+
+<h2>Frequency Response of BandStop Filter</h2>
+<div id="bandstop-plot"></div>
+
+<h2>Frequency Response of Cascaded Filter (BandPass × BandStop)</h2>
+<div id="cascaded-plot"></div>
+
+<script>
+    window.onload = function () {
+        console.log("Math.js Loaded:", typeof math !== "undefined");
+        console.log("Plotly Loaded:", typeof Plotly !== "undefined");
+
+        if (typeof math === "undefined" || typeof Plotly === "undefined") {
+            alert("Error: Math.js or Plotly.js failed to load. Check your internet connection.");
+            return;
+        }
+
+        function BandPassFilter(x) {
+            let Numerator = math.complex(1, 0);
+            let Denominator = math.complex(1, 0);
+
+            for (let k = 0; k < 7; k++) {
+                let angle = (2 * k + 1) * Math.PI / 14;
+                let term1 = math.multiply(math.complex(0, -1), math.multiply(Math.cos(angle), Math.cosh(0.227540122101)));
+                let term2 = math.multiply(Math.sin(angle), Math.sinh(0.227540122101));
+
+                let exponent = math.exp(math.multiply(math.complex(0, -1), x));
+                let fraction = math.divide(math.subtract(1, exponent), math.add(1, exponent));
+
+                let term3 = math.divide(math.add(math.pow(fraction, 2), 0.918), math.multiply(1.59, fraction));
+
+                Numerator = math.multiply(Numerator, math.add(term1, term2));
+                Denominator = math.multiply(Denominator, math.subtract(math.subtract(term3, term1), term2));
+            }
+
+            return math.divide(Numerator, Denominator);
+        }
+
+        function BandStopFilter(x) {
+            let Numerator = math.complex(1, 0);
+            let Denominator = math.complex(1, 0);
+
+            for (let k = 0; k < 7; k++) {
+                let angle = (2 * k + 1) * Math.PI / 14;
+                let term1 = math.multiply(math.complex(0, -1), math.multiply(Math.cos(angle), Math.cosh(0.227540122101)));
+                let term2 = math.multiply(Math.sin(angle), Math.sinh(0.227540122101));
+
+                let exponent = math.exp(math.multiply(math.complex(0, -1), x));
+                let fraction = math.divide(math.subtract(1, exponent), math.add(1, exponent));
+
+                let term3 = math.divide(math.multiply(0.825, fraction), math.add(math.pow(fraction, 2), 0.94815));
+
+                Numerator = math.multiply(Numerator, math.add(term1, term2));
+                Denominator = math.multiply(Denominator, math.subtract(math.add(term3, term2), term1));
+            }
+
+            return math.divide(Numerator, Denominator);
+        }
+
+	// Values on the x-axis
+        let x_values = math.range(-Math.PI, Math.PI, 2 * Math.PI / 1000).toArray();
+        
+	// BandPass Filter Response
+	let y_bandpass = x_values.map(x => BandPassFilter(x));
+        let mag_bandpass = y_bandpass.map(y => math.abs(y));
+
+	// BandStop Filter Response
+        let y_bandstop = x_values.map(x => BandStopFilter(x));
+        let mag_bandstop = y_bandstop.map(y => math.abs(y));
+
+	// Cascaded Filter Response
+        let y_cascaded = y_bandpass.map((bp, i) => math.multiply(bp, y_bandstop[i]));
+        let mag_cascaded = y_cascaded.map(y => math.abs(y));
+
+
+
+        let trace1 = {
+            x: x_values,
+            y: mag_bandpass,
+            mode: 'lines',
+            line: { color: 'red' },
+            name: 'BandPass Magnitude'
+        };
+
+        let layout1 = {
+            title: "Frequency Response of BandPass Filter",
+            xaxis: { title: "Omega" },
+            yaxis: { title: "Frequency Response" },
+            grid: { visible: true }
+        };
+
+        Plotly.newPlot("bandpass-plot", [trace1], layout1);
+
+
+
+	let trace2 = {
+            x: x_values,
+            y: mag_bandstop,
+            mode: 'lines',
+            line: { color: 'blue' },
+            name: 'BandStop Magnitude'
+        };
+
+        let layout2 = {
+            title: "Frequency Response of BandStop Filter",
+            xaxis: { title: "Omega" },
+            yaxis: { title: "Frequency Response" },
+            grid: { visible: true }
+        };
+
+        Plotly.newPlot("bandstop-plot", [trace2], layout2);
+
+
+
+        let trace3 = {
+            x: x_values,
+            y: mag_cascaded,
+            mode: 'lines',
+            line: { color: 'purple' },
+            name: 'Cascaded Filter Magnitude'
+        };
+
+        let layout3 = {
+            title: "Frequency Response of Cascaded Filter (BandPass × BandStop)",
+            xaxis: { title: "Omega" },
+            yaxis: { title: "Frequency Response" },
+            grid: { visible: true }
+        };
+
+        Plotly.newPlot("cascaded-plot", [trace3], layout3);
+    };
+</script>
+
+</body>
+</html>
+\end{lstlisting}
 
 
 \section{Comparison}
@@ -1048,7 +1307,7 @@ Both filters have their own advantages. The \textbf{Butterworth filter} provides
 \textbf{Review Comments} :\\
 I have reviewed the filter design assignment of Anupam Rawat, Roll Number 22B3982. The filter number assigned to him is 104. Following are my comments on his
 assignment:\\
-He has correctly implemented the filter, and the response are in accordance to the expected frequency response. He has also correctly used the butterworth approximations to
+He has correctly implemented the filter, and the response are in accordance to the expected frequency response. He has also correctly used the chebyshev approximations to
 implement the IIR designs for each filter. He has included all the code, results and their plots in the report.\\
 
 \section*{Acknowledgements}
