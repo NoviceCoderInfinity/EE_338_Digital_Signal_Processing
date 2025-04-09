@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>FIR Low Pass Filters - Vertical Full Width Plots</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: sans-serif;
+    }
+
+    .chart-wrapper {
+      width: 100vw;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    canvas {
+      width: 100% !important;
+      height: 300px !important;
+    }
+
+    h2 {
+      text-align: center;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h2>FIR Low Pass Filter Frequency Responses</h2>
+
+  <div class="chart-wrapper"><canvas id="lpf1Chart"></canvas></div>
+  <div class="chart-wrapper"><canvas id="lpf2Chart"></canvas></div>
+  <div class="chart-wrapper"><canvas id="lpf3Chart"></canvas></div>
+  <div class="chart-wrapper"><canvas id="lpf4Chart"></canvas></div>
+  <div class="chart-wrapper"><canvas id="combinedChart"></canvas></div>
+
+  <script>
+    class FIRLowPassFilter {
+      constructor(fs, fc, N, beta, deltaOmegaT, numPoints) {
+        this.fs = fs;
+        this.fc = fc;
+        this.N = N;
+        this.numTaps = 2 * N + 1;
+        this.beta = beta;
+        this.deltaOmegaT = deltaOmegaT;
+        this.n = Array.from({ length: 2 * N + 1 }, (_, i) => i - N);
+        this.numPoints = numPoints;
+      }
+
+      i0(x, numTerms = 50) {
+        let result = 0;
+        for (let n = 0; n < numTerms; n++) {
+          let term = Math.pow(x / 2, 2 * n) / this.factorial(n);
+          result += term;
+        }
+        return result;
+      }
+
+      factorial(n) {
+        if (n === 0 || n === 1) return 1;
+        let res = 1;
+        for (let i = 2; i <= n; i++) res *= i;
+        return res;
+      }
+
+      get_H_FIR() {
+        let alpha = this.N;
+        let temp_arr = new Array(this.numTaps).fill(1);
+        for (let i = -this.N; i <= this.N; i++) {
+          let idx = i + this.N;
+          if (i !== 0) {
+            let sinc = Math.sin(i * (this.fc / 315) * Math.PI) / (i * Math.PI);
+            let window = this.i0(this.beta * Math.sqrt(1 - Math.pow(i / alpha, 2))) / this.i0(this.beta);
+            temp_arr[idx] *= window * sinc;
+          } else {
+            temp_arr[idx] *= (this.fc / 315);
+          }
+        }
+        return temp_arr;
+      }
+
+      DTFT(X_vals, time_series) {
+        let dtft_arr = [];
+        for (let omega of X_vals) {
+          let sumReal = 0;
+          let sumImag = 0;
+          for (let k = -this.N; k <= this.N; k++) {
+            let idx = k + this.N;
+            let angle = omega * k;
+            sumReal += time_series[idx] * Math.cos(angle);
+            sumImag -= time_series[idx] * Math.sin(angle);
+          }
+          dtft_arr.push(Math.sqrt(sumReal * sumReal + sumImag * sumImag));
+        }
+        return dtft_arr;
+      }
+
+      plot_frequency_response() {
+        const h = this.get_H_FIR();
+        const X_vals = Array.from({ length: this.numPoints }, (_, i) => -Math.PI + 2 * Math.PI * i / this.numPoints);
+        const dtft = this.DTFT(X_vals, h);
+        return { X_vals, dtft };
+      }
+    }
+
+    // Filter parameters
+    const fs = 630, N = 91, beta = 1.90, deltaOmegaT = 0.0158 * Math.PI, numPoints = 2000;
+    const LPFs = [
+      new FIRLowPassFilter(fs, 80, N, beta, deltaOmegaT, numPoints),
+      new FIRLowPassFilter(fs, 115, N, beta, deltaOmegaT, numPoints),
+      new FIRLowPassFilter(fs, 190, N, beta, deltaOmegaT, numPoints),
+      new FIRLowPassFilter(fs, 225, N, beta, deltaOmegaT, numPoints)
+    ];
+
+    const colors = ["red", "green", "orange", "purple"];
+    const labels = ["LPF1 (fc=80Hz)", "LPF2 (fc=115Hz)", "LPF3 (fc=190Hz)", "LPF4 (fc=225Hz)"];
+    const canvasIds = ["lpf1Chart", "lpf2Chart", "lpf3Chart", "lpf4Chart"];
+    const dtftResults = [];
+    let X_vals_Hz = [];
+
+    // Plot each filter
+    LPFs.forEach((filter, idx) => {
+      const { X_vals, dtft } = filter.plot_frequency_response();
+      dtftResults.push(dtft);
+      if (idx === 0) {
+        X_vals_Hz = X_vals.map(x => (x * fs) / (2 * Math.PI));
+      }
+
+      const ctx = document.getElementById(canvasIds[idx]).getContext('2d');
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: X_vals_Hz,
+          datasets: [{
+            label: labels[idx],
+            data: dtft,
+            borderColor: colors[idx],
+            borderWidth: 2,
+            pointRadius: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: {
+              title: { display: true, text: 'Frequency (Hz)' },
+              ticks: { autoSkip: true, maxTicksLimit: 10 },
+              type: 'linear'
+            },
+            y: {
+              title: { display: true, text: 'Magnitude' }
+            }
+          },
+          plugins: {
+            legend: { display: false },
+            title: { display: true, text: labels[idx] }
+          }
+        }
+      });
+    });
+
+    // Combined plot
+    const ctxCombined = document.getElementById("combinedChart").getContext('2d');
+    new Chart(ctxCombined, {
+      type: 'line',
+      data: {
+        labels: X_vals_Hz,
+        datasets: dtftResults.map((dtft, i) => ({
+          label: labels[i],
+          data: dtft,
+          borderColor: colors[i],
+          borderWidth: 2,
+          pointRadius: 0
+        }))
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: {
+            title: { display: true, text: 'Frequency (Hz)' },
+            type: 'linear',
+            ticks: { autoSkip: true, maxTicksLimit: 10 }
+          },
+          y: {
+            title: { display: true, text: 'Magnitude' }
+          }
+        },
+        plugins: {
+          legend: { display: true },
+          title: { display: true, text: 'Combined Frequency Response of LPF1-4' }
+        }
+      }
+    });
+  </script>
+</body>
+</html>

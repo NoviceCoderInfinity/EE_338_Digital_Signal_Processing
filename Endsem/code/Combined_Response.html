@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <title>Kaiser FIR Filter</title>
+</head>
+<body>
+  <div id="plot" style="width: 100%; height: 600px;"></div>
+
+  <script>
+    class CombinedResponse {
+      constructor(fs = 630, N = 65, beta = null, delta_omega = 0.0158 * Math.PI) {
+        this.fs = fs;
+        this.N = N;
+        this.numtaps = 2 * N + 1;
+        this.delta_omega = delta_omega;
+        this.n = Array.from({ length: 2 * N + 1 }, (_, i) => i - N);
+        this.beta = beta !== null ? beta : 0.80 / N;
+        this.h = this._get_H_FIR();
+      }
+
+      static compute_A(delta) {
+        return -20 * Math.log10(delta);
+      }
+
+      static compute_beta(A) {
+        if (A <= 21) return 0;
+        else if (A <= 50)
+          return 0.5842 * Math.pow(A - 21, 0.4) + 0.07886 * (A - 21);
+        else
+          return 0.1102 * (A - 8.7);
+      }
+
+      static compute_N(A, delta_omega) {
+        return Math.ceil((A - 8) / (2.285 * delta_omega));
+      }
+
+      _i0(x, num_terms = 50) {
+        let result = 0;
+        for (let n = 0; n < num_terms; n++) {
+          const term = Math.pow(x / 2, 2 * n) / this._factorial(n);
+          result += term;
+        }
+        return result;
+      }
+
+      _factorial(n) {
+        if (n === 0 || n === 1) return 1;
+        let result = 1;
+        for (let i = 2; i <= n; i++) result *= i;
+        return result;
+      }
+
+      _get_H_FIR() {
+        const alpha = this.N;
+        const temp_arr = new Array(this.numtaps).fill(1);
+        for (let i = -this.N; i <= this.N; i++) {
+          const idx = i + this.N;
+          if (i !== 0) {
+            const bessel_ratio = this._i0(this.beta * Math.sqrt(1 - Math.pow(i / alpha, 2))) / this._i0(this.beta);
+            const sinc_combination =
+              (Math.sin(i * (115 / 315) * Math.PI) / (i * Math.PI)) -
+              (Math.sin(i * (80 / 315) * Math.PI) / (i * Math.PI)) +
+              (Math.sin(i * (225 / 315) * Math.PI) / (i * Math.PI)) -
+              (Math.sin(i * (190 / 315) * Math.PI) / (i * Math.PI));
+            temp_arr[idx] *= bessel_ratio * sinc_combination;
+          } else {
+            temp_arr[idx] *= ((115 - 80 + 225 - 190) / 315);
+          }
+        }
+        return temp_arr;
+      }
+
+      compute_DTFT(X_vals) {
+        const dtft_arr = [];
+        for (const omega of X_vals) {
+          let sum_val_real = 0;
+          let sum_val_imag = 0;
+          for (let k = -this.N; k <= this.N; k++) {
+            const h_k = this.h[k + this.N];
+            sum_val_real += h_k * Math.cos(omega * k);
+            sum_val_imag -= h_k * Math.sin(omega * k);
+          }
+          dtft_arr.push(Math.sqrt(sum_val_real ** 2 + sum_val_imag ** 2));
+        }
+        return dtft_arr;
+      }
+
+      plot_response() {
+        // const X_vals = Array.from({ length: 2000 }, (_, i) => -MathPI + (2 * Math.PI * i) / 2000);
+		const X_vals = Array.from({ length: 2000 }, (_, i) => (Math.PI * i) / 2000);
+
+        const dtft_vals = this.compute_DTFT(X_vals);
+
+        const trace = {
+          x: X_vals,
+          y: dtft_vals,
+          mode: 'lines',
+          name: 'Magnitude Response',
+        };
+
+        const layout = {
+          title: 'Multi Band-Pass FIR Filter with Kaiser Window',
+          xaxis: { title: 'Frequency (rad/sample)' },
+          yaxis: { title: 'Magnitude' },
+        };
+
+        Plotly.newPlot('plot', [trace], layout);
+      }
+    }
+
+    // Example usage:
+    const delta = 0.0375;
+    const delta_omega = 0.0158 * Math.PI;
+
+    const A = CombinedResponse.compute_A(delta);
+    const beta = CombinedResponse.compute_beta(A);
+    const N = CombinedResponse.compute_N(A, delta_omega);
+
+    console.log(`A = ${A.toFixed(2)} dB`);
+    console.log(`Beta = ${beta.toFixed(4)}`);
+    console.log(`N = ${N}`);
+
+    const cr = new CombinedResponse(undefined, N, beta, delta_omega);
+    cr.plot_response();
+  </script>
+</body>
+</html>
